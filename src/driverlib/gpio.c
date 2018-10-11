@@ -4,23 +4,23 @@
 //
 // Copyright (c) 2005-2017 Texas Instruments Incorporated.  All rights reserved.
 // Software License Agreement
-// 
+//
 //   Redistribution and use in source and binary forms, with or without
 //   modification, are permitted provided that the following conditions
 //   are met:
-// 
+//
 //   Redistributions of source code must retain the above copyright
 //   notice, this list of conditions and the following disclaimer.
-// 
+//
 //   Redistributions in binary form must reproduce the above copyright
 //   notice, this list of conditions and the following disclaimer in the
-//   documentation and/or other materials provided with the  
+//   documentation and/or other materials provided with the
 //   distribution.
-// 
+//
 //   Neither the name of Texas Instruments Incorporated nor the names of
 //   its contributors may be used to endorse or promote products derived
 //   from this software without specific prior written permission.
-// 
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 // "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 // LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -32,7 +32,7 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-// 
+//
 // This is part of revision 2.1.4.178 of the Tiva Peripheral Driver Library.
 //
 //*****************************************************************************
@@ -481,6 +481,143 @@ GPIOIntTypeGet(uint32_t ui32Port, uint8_t ui8Pin)
     ui32SI = HWREG(ui32Port + GPIO_O_SI);
     return(((ui32IBE & ui8Pin) ? 1 : 0) | ((ui32IS & ui8Pin) ? 2 : 0) |
            ((ui32IEV & ui8Pin) ? 4 : 0) | (ui32SI & 0x01) ? 0x10000 : 0);
+}
+
+//*****************************************************************************
+//
+//! Sets the drive strength for the specified pin(s).
+//!
+//! \param ui32Port is the base address of the GPIO port.
+//! \param ui8Pins is the bit-packed representation of the pin(s).
+//! \param ui32Strength specifies the output drive strength.
+//!
+//! This function sets the drive strength for the specified pin(s)
+//! on the selected GPIO port.
+//!
+//! The parameter \e ui32Strength can be one of the following values:
+//!
+//! - \b GPIO_STRENGTH_2MA
+//! - \b GPIO_STRENGTH_4MA
+//! - \b GPIO_STRENGTH_8MA
+//! - \b GPIO_STRENGTH_8MA_SC
+//! - \b GPIO_STRENGTH_6MA
+//! - \b GPIO_STRENGTH_10MA
+//! - \b GPIO_STRENGTH_12MA
+//!
+//! where \b GPIO_STRENGTH_xMA specifies either 2, 4, or 8 mA output drive
+//! strength, and \b GPIO_OUT_STRENGTH_8MA_SC specifies 8 mA output drive with
+//! slew control.
+//!
+//! Some Tiva devices also support output drive strengths of 6, 10, and 12
+//! mA.
+//!
+//! \return None.
+//
+//*****************************************************************************
+void
+GPIODriveStrengthSet(uint32_t ui32Port, uint8_t ui8Pins, uint32_t ui32Strength)
+{
+    //
+    // Check the arguments.
+    //
+    ASSERT(_GPIOBaseValid(ui32Port));
+    ASSERT((ui32Strength == GPIO_STRENGTH_2MA) ||
+           (ui32Strength == GPIO_STRENGTH_4MA) ||
+           (ui32Strength == GPIO_STRENGTH_6MA) ||
+           (ui32Strength == GPIO_STRENGTH_8MA) ||
+           (ui32Strength == GPIO_STRENGTH_8MA_SC) ||
+           (ui32Strength == GPIO_STRENGTH_10MA) ||
+           (ui32Strength == GPIO_STRENGTH_12MA));
+
+    //
+    // Set the output drive strength.
+    //
+    HWREG(ui32Port + GPIO_O_DR2R) = ((ui32Strength & 1) ?
+                                     (HWREG(ui32Port + GPIO_O_DR2R) |
+                                      ui8Pins) :
+                                     (HWREG(ui32Port + GPIO_O_DR2R) &
+                                      ~(ui8Pins)));
+    HWREG(ui32Port + GPIO_O_DR4R) = ((ui32Strength & 2) ?
+                                     (HWREG(ui32Port + GPIO_O_DR4R) |
+                                      ui8Pins) :
+                                     (HWREG(ui32Port + GPIO_O_DR4R) &
+                                      ~(ui8Pins)));
+    HWREG(ui32Port + GPIO_O_DR8R) = ((ui32Strength & 4) ?
+                                     (HWREG(ui32Port + GPIO_O_DR8R) |
+                                      ui8Pins) :
+                                     (HWREG(ui32Port + GPIO_O_DR8R) &
+                                      ~(ui8Pins)));
+    HWREG(ui32Port + GPIO_O_SLR) = ((ui32Strength & 8) ?
+                                    (HWREG(ui32Port + GPIO_O_SLR) |
+                                     ui8Pins) :
+                                    (HWREG(ui32Port + GPIO_O_SLR) &
+                                     ~(ui8Pins)));
+
+
+    //
+    // Set the 12-mA drive select register.  This register only appears in
+    // TM4E111 and later device classes, but is a harmless write on older
+    // devices.
+    //
+    HWREG(ui32Port + GPIO_O_DR12R) = ((ui32Strength & 0x10) ?
+                                      (HWREG(ui32Port + GPIO_O_DR12R) |
+                                       ui8Pins) :
+                                      (HWREG(ui32Port + GPIO_O_DR12R) &
+                                       ~(ui8Pins)));
+}
+
+//*****************************************************************************
+//
+//! Sets the drive strength for the specified pin(s).
+//!
+//! \param ui32Port is the base address of the GPIO port.
+//! \param ui8Pins is the bit-packed representation of the pin(s).
+//! \param ui32Strength specifies the output drive strength.
+//!
+//! This function sets the drive strength for the specified pin(s)
+//! on the selected GPIO port.
+//!
+//! The parameter \e ui32Strength can be one of the following values:
+//!
+//! - \b GPIO_STRENGTH_2MA
+//! - \b GPIO_STRENGTH_4MA
+//! - \b GPIO_STRENGTH_8MA
+//! - \b GPIO_STRENGTH_8MA_SC
+//! - \b GPIO_STRENGTH_6MA
+//! - \b GPIO_STRENGTH_10MA
+//! - \b GPIO_STRENGTH_12MA
+//!
+//! where \b GPIO_STRENGTH_xMA specifies either 2, 4, or 8 mA output drive
+//! strength, and \b GPIO_OUT_STRENGTH_8MA_SC specifies 8 mA output drive with
+//! slew control.
+//!
+//! Some Tiva devices also support output drive strengths of 6, 10, and 12
+//! mA.
+//!
+//! \return None.
+//
+//*****************************************************************************
+void
+GPIOResistorSet(uint32_t ui32Port, uint8_t ui8Pins, uint32_t ui32ResType)
+{
+    //
+    // Check the arguments.
+    //
+    ASSERT(_GPIOBaseValid(ui32Port));
+    ASSERT((ui32ResType == GPIO_RES_NONE) ||
+           (ui32ResType == GPIO_RES_PULLUP) ||
+           (ui32ResType == GPIO_RES_PULLDOWN));
+
+    //
+    // Set the resistor type.
+    //
+    HWREG(ui32Port + GPIO_O_PUR) = ((ui32ResType & 1) ?
+      (HWREG(ui32Port + GPIO_O_PUR) | ui8Pins) :
+        (HWREG(ui32Port + GPIO_O_PUR) & ~(ui8Pins)));
+
+    HWREG(ui32Port + GPIO_O_PDR) = ((ui32ResType & 2) ?
+      (HWREG(ui32Port + GPIO_O_PDR) | ui8Pins) :
+        (HWREG(ui32Port + GPIO_O_PDR) & ~(ui8Pins)));
 }
 
 //*****************************************************************************
@@ -1113,6 +1250,37 @@ GPIOPinRead(uint32_t ui32Port, uint8_t ui8Pins)
     // Return the pin value(s).
     //
     return(HWREG(ui32Port + (GPIO_O_DATA + (ui8Pins << 2))));
+}
+
+//*****************************************************************************
+//
+//! Toggles specified pin(s).
+//!
+//! \param ui32Port is the base address of the GPIO port.
+//! \param ui8Pins is the bit-packed representation of the pin(s).
+//!
+//! Writes the corresponding bit values to the output pin(s) specified by
+//! \e ui8Pins.  Writing to a pin configured as an input pin has no effect.
+//!
+//! The pin(s) are specified using a bit-packed byte, where each bit that is
+//! set identifies the pin to be accessed, and where bit 0 of the byte
+//! represents GPIO port pin 0, bit 1 represents GPIO port pin 1, and so on.
+//!
+//! \return None.
+//
+//*****************************************************************************
+void
+GPIOPinToggle(uint32_t ui32Port, uint8_t ui8Pins)
+{
+    //
+    // Check the arguments.
+    //
+    ASSERT(_GPIOBaseValid(ui32Port));
+
+    //
+    // Toggle the pins.
+    //
+    HWREG(ui32Port + (GPIO_O_DATA + (ui8Pins << 2))) ^= ui8Pins;
 }
 
 //*****************************************************************************

@@ -4,23 +4,23 @@
 //
 // Copyright (c) 2005-2017 Texas Instruments Incorporated.  All rights reserved.
 // Software License Agreement
-// 
+//
 //   Redistribution and use in source and binary forms, with or without
 //   modification, are permitted provided that the following conditions
 //   are met:
-// 
+//
 //   Redistributions of source code must retain the above copyright
 //   notice, this list of conditions and the following disclaimer.
-// 
+//
 //   Redistributions in binary form must reproduce the above copyright
 //   notice, this list of conditions and the following disclaimer in the
-//   documentation and/or other materials provided with the  
+//   documentation and/or other materials provided with the
 //   distribution.
-// 
+//
 //   Neither the name of Texas Instruments Incorporated nor the names of
 //   its contributors may be used to endorse or promote products derived
 //   from this software without specific prior written permission.
-// 
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 // "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 // LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -32,7 +32,7 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-// 
+//
 // This is part of revision 2.1.4.178 of the Tiva Peripheral Driver Library.
 //
 //*****************************************************************************
@@ -105,6 +105,15 @@ extern "C"
 
 //*****************************************************************************
 //
+//
+//*****************************************************************************
+#define GPIO_RES_NONE           0x00000000  //
+#define GPIO_RES_PULLUP         0x00000001  //
+#define GPIO_RES_PULLDOWN       0x00000002  //
+
+
+//*****************************************************************************
+//
 // Values that can be passed to GPIOPadConfigSet as the ui32PadType parameter,
 // and returned by GPIOPadConfigGet in the *pui32PadType parameter.
 //
@@ -144,6 +153,8 @@ extern uint32_t GPIODirModeGet(uint32_t ui32Port, uint8_t ui8Pin);
 extern void GPIOIntTypeSet(uint32_t ui32Port, uint8_t ui8Pins,
                            uint32_t ui32IntType);
 extern uint32_t GPIOIntTypeGet(uint32_t ui32Port, uint8_t ui8Pin);
+extern void GPIODriveStrengthSet(uint32_t ui32Port, uint8_t ui8Pins, uint32_t ui32Strength);
+extern void GPIOResistorSet(uint32_t ui32Port, uint8_t ui8Pin, uint32_t ui32ResType);
 extern void GPIOPadConfigSet(uint32_t ui32Port, uint8_t ui8Pins,
                              uint32_t ui32Strength, uint32_t ui32PadType);
 extern void GPIOPadConfigGet(uint32_t ui32Port, uint8_t ui8Pin,
@@ -158,6 +169,7 @@ extern void GPIOIntRegisterPin(uint32_t ui32Port, uint32_t ui32Pin,
                                void (*pfnIntHandler)(void));
 extern void GPIOIntUnregisterPin(uint32_t ui32Port, uint32_t ui32Pin);
 extern int32_t GPIOPinRead(uint32_t ui32Port, uint8_t ui8Pins);
+extern void GPIOPinToggle(uint32_t ui32Port, uint8_t ui8Pins);
 extern void GPIOPinWrite(uint32_t ui32Port, uint8_t ui8Pins, uint8_t ui8Val);
 extern void GPIOPinConfigure(uint32_t ui32PinConfig);
 extern void GPIOPinTypeADC(uint32_t ui32Port, uint8_t ui8Pins);
