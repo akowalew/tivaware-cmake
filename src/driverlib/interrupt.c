@@ -170,6 +170,7 @@ _IntDefaultHandler(void)
 //
 #undef NUM_INTERRUPTS
 #define NUM_INTERRUPTS                          155
+
 #if defined(ewarm)
 #pragma data_alignment=1024
 static __no_init void (*g_pfnRAMVectors[NUM_INTERRUPTS])(void) @ "VTABLE";
@@ -184,6 +185,11 @@ void (*g_pfnRAMVectors[NUM_INTERRUPTS])(void);
 static __attribute__((section("vtable")))
 void (*g_pfnRAMVectors[NUM_INTERRUPTS])(void) __attribute__((aligned(1024)));
 #endif
+
+//
+// Create table of additional user's data pointers for each interrupt
+//
+static void* g_pvDataArray[NUM_INTERRUPTS];
 
 //*****************************************************************************
 //
@@ -390,6 +396,53 @@ IntUnregister(uint32_t ui32Interrupt)
     //
     g_pfnRAMVectors[ui32Interrupt] = _IntDefaultHandler;
 }
+
+//*****************************************************************************
+//
+//! 
+//!
+//! \param ui32Interrupt specifies the interrupt in question.
+//!
+//! \return None.
+//
+//*****************************************************************************
+void
+IntDataSet(uint32_t ui32Interrupt, void* pvData)
+{
+    //
+    // Check the arguments.
+    //
+    ASSERT(ui32Interrupt < NUM_INTERRUPTS);
+
+    //
+    // Reset the interrupt handler.
+    //
+    g_pvDataArray[ui32Interrupt] = pvData;
+}
+
+//*****************************************************************************
+//
+//! 
+//!
+//! \param ui32Interrupt specifies the interrupt in question.
+//!
+//! \return None.
+//
+//*****************************************************************************
+void*
+IntDataGet(uint32_t ui32Interrupt)
+{
+    //
+    // Check the arguments.
+    //
+    ASSERT(ui32Interrupt < NUM_INTERRUPTS);
+
+    //
+    // Reset the interrupt handler.
+    //
+    return g_pvDataArray[ui32Interrupt];
+}
+
 
 //*****************************************************************************
 //
